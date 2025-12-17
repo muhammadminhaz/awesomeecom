@@ -31,3 +31,7 @@ Accept: application/json
 ### Validate Token
 GET http://localhost:4000/customer/validate
 Authorization: Bearer {{token}}
+
+### Get Customer Profile
+GET http://localhost:4000/customer/me
+Authorization: Bearer {{token}}

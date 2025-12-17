@@ -1,13 +1,16 @@
 package com.muhammadminhaz.customerservice.service;
 
+import com.muhammadminhaz.customerservice.dto.CustomerProfileResponseDTO;
 import com.muhammadminhaz.customerservice.dto.LoginRequestDTO;
 import com.muhammadminhaz.customerservice.dto.RegisterRequestDTO;
 import com.muhammadminhaz.customerservice.entity.Customer;
 import com.muhammadminhaz.customerservice.repository.CustomerRepository;
 import com.muhammadminhaz.customerservice.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -26,7 +29,7 @@ public class CustomerService {
     public Optional<String> authenticate(LoginRequestDTO loginRequestDTO) {
         return findByUsername(loginRequestDTO.getUsername())
                 .filter(u -> passwordEncoder.matches(loginRequestDTO.getPassword(), u.getPassword()))
-                .map(u -> jwtUtil.generateToken(u.getEmail(), u.getRole()));
+                .map(u -> jwtUtil.generateToken(u.getUsername(), u.getRole()));
     }
 
     public boolean validateToken(String token) {
@@ -57,5 +60,28 @@ public class CustomerService {
 
         customerRepository.save(customer);
         return true;
+    }
+
+    public CustomerProfileResponseDTO getCustomerProfile(String token) {
+        String username = jwtUtil.extractUsername(token);
+        CustomerProfileResponseDTO customerProfileResponseDTO = new CustomerProfileResponseDTO();
+        Customer customer = findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+        customerProfileResponseDTO.setUsername(customer.getUsername());
+        customerProfileResponseDTO.setName(customer.getName());
+        customerProfileResponseDTO.setEmail(customer.getEmail());
+        customerProfileResponseDTO.setAddress(customer.getAddress());
+        customerProfileResponseDTO.setPhone(customer.getPhone());
+        return customerProfileResponseDTO;
+    }
+
+    public String extractToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid Authorization header"
+            );
+        }
+        return authHeader.substring(7);
     }
 }

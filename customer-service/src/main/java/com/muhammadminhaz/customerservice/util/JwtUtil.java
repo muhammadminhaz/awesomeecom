@@ -22,9 +22,9 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(encodedKey);
     }
 
-    public String generateToken(String email, String role) {
+    public String generateToken(String username, String role) {
         return Jwts.builder()
-                .subject(email)
+                .subject(username)
                 .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 36000 * 1000))
@@ -45,4 +45,19 @@ public class JwtUtil {
             throw new JwtException("Invalid JWT Token");
         }
     }
+
+    public String extractUsername(String token) {
+        try {
+            return Jwts
+                    .parser()
+                    .verifyWith((SecretKey) key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+        } catch (JwtException e) {
+            throw new JwtException("Invalid or expired JWT token");
+        }
+    }
+
 }

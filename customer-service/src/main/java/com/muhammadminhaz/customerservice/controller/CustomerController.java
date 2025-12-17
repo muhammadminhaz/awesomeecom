@@ -1,14 +1,13 @@
 package com.muhammadminhaz.customerservice.controller;
 
-import com.muhammadminhaz.customerservice.dto.LoginRequestDTO;
-import com.muhammadminhaz.customerservice.dto.LoginResponseDTO;
-import com.muhammadminhaz.customerservice.dto.RegisterRequestDTO;
-import com.muhammadminhaz.customerservice.dto.RegisterResponseDTO;
+import com.muhammadminhaz.customerservice.dto.*;
 import com.muhammadminhaz.customerservice.service.CustomerService;
+import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -54,5 +53,21 @@ public class CustomerController {
         }
 
         return customerService.validateToken(authHeader.substring(7)) ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @Operation(summary = "Get Customer Profile")
+    @GetMapping("/me")
+    public ResponseEntity<CustomerProfileResponseDTO> getCustomerProfile(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = customerService.extractToken(authHeader);
+            CustomerProfileResponseDTO profile = customerService.getCustomerProfile(token);
+            return ResponseEntity.ok(profile);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (JwtException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+        }
     }
 }
