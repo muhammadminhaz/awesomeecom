@@ -1,11 +1,6 @@
 package com.muhammadminhaz.customerservice.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -16,7 +11,12 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "customers")
+@Table(
+        name = "customers",
+        indexes = {
+                @Index(name = "idx_customer_username", columnList = "username")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,7 +28,7 @@ public class Customer {
     private UUID id;
 
     @NotBlank(message = "Username is required")
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @NotBlank(message = "Name is required")
