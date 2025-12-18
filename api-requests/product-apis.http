@@ -1,0 +1,16 @@
+### GET request to fetch products
+GET http://localhost:4001/products
+
+
+### Create a product
+POST http://localhost:4001/products/create
+Content-Type: application/json
+
+{
+  "name": "Awesome Widget",
+  "description": "This is a fantastic widget.",
+  "category": "Gadgets",
+  "brand": "WidgetCo",
+  "price": 49.99,
+  "stockQuantity": 100
+}

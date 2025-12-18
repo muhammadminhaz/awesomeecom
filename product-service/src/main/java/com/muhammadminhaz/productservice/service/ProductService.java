@@ -1,0 +1,110 @@
+package com.muhammadminhaz.productservice.service;
+
+import com.muhammadminhaz.productservice.dto.CreateProductRequestDto;
+import com.muhammadminhaz.productservice.dto.PaginatedResponse;
+import com.muhammadminhaz.productservice.dto.ProductDto;
+import com.muhammadminhaz.productservice.entity.Product;
+import com.muhammadminhaz.productservice.entity.ProductImage;
+import com.muhammadminhaz.productservice.repository.ProductRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+public class ProductService {
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    public PaginatedResponse<ProductDto> getAllProducts(int page, int size, String sort, String sortBy, String searchValue) {
+        Pageable pageable = PageRequest.of(
+                page - 1,
+                size,
+                sort.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending()
+        );
+
+        Page<Product> productPage;
+        if (searchValue == null || searchValue.isBlank()) {
+            productPage = productRepository.findAll(pageable);
+        } else {
+            productPage = productRepository.findByNameContainingIgnoreCase(searchValue, pageable);
+        }
+
+        List<ProductDto> dtos = productPage.stream().map(product -> {
+            ProductDto dto = new ProductDto();
+            dto.setSku(product.getSku());
+            dto.setName(product.getName());
+            dto.setDescription(product.getDescription());
+            dto.setCategory(product.getCategory());
+            dto.setBrand(product.getBrand());
+            dto.setPrice(product.getPrice());
+            dto.setStockQuantity(product.getStockQuantity());
+            dto.setCreatedAt(product.getCreatedAt());
+            dto.setUpdatedAt(product.getUpdatedAt());
+            dto.setImageUrls(
+                    product.getImages().stream()
+                            .map(ProductImage::getUrl)
+                            .collect(Collectors.toList())
+            );
+            return dto;
+        }).collect(Collectors.toList());
+
+        PaginatedResponse<ProductDto> response = new PaginatedResponse<>();
+        response.setContent(dtos);
+        response.setCurrentPage(productPage.getNumber() + 1);
+        response.setTotalPages(productPage.getTotalPages());
+        response.setTotalItems(productPage.getTotalElements());
+        response.setPageSize(productPage.getSize());
+
+        return response;
+    }
+
+    @Transactional
+    public ProductDto createProduct(CreateProductRequestDto createProductRequestDto) {
+        Product product = Product.builder()
+                .sku("PROD-" + System.currentTimeMillis() % 1_000_000_000)
+                .name(createProductRequestDto.getName())
+                .description(createProductRequestDto.getDescription())
+                .category(createProductRequestDto.getCategory())
+                .brand(createProductRequestDto.getBrand())
+                .price(createProductRequestDto.getPrice())
+                .stockQuantity(createProductRequestDto.getStockQuantity())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Product savedProduct = productRepository.save(product);
+        return mapToDto(savedProduct);
+    }
+
+    private ProductDto mapToDto(Product product) {
+        ProductDto dto = new ProductDto();
+        dto.setSku(product.getSku());
+        dto.setName(product.getName());
+        dto.setDescription(product.getDescription());
+        dto.setCategory(product.getCategory());
+        dto.setBrand(product.getBrand());
+        dto.setPrice(product.getPrice());
+        dto.setStockQuantity(product.getStockQuantity());
+        dto.setCreatedAt(product.getCreatedAt());
+        dto.setUpdatedAt(product.getUpdatedAt());
+        dto.setImageUrls(
+                product.getImages() == null
+                        ? List.of()
+                        : product.getImages().stream()
+                        .map(ProductImage::getUrl)
+                        .toList()
+        );
+        return dto;
+    }
+
+}
