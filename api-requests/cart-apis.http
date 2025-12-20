@@ -1,0 +1,22 @@
+### Get cart for a user
+GET http://localhost:4002/cart/{userId}
+
+### Add item to cart
+POST http://localhost:4002/carts/add-item
+Content-Type: application/json
+
+{
+  "customerId": "81674121-8324-4979-a25f-85ee098189e8",
+  "productId": "18ba68c4-75b4-4062-9157-c6f2ea32ba6a",
+  "price": 49.99
+}
+### c9025012-ef87-45ce-a097-20b3e2c98409
+
+### Update item quantity
+PUT http://localhost:4002/cart/{userId}/item
+
+### Remove item from cart
+DELETE http://localhost:4002/cart/{userId}/item
+
+### Clear cart
+DELETE http://localhost:4002/cart/{userId}

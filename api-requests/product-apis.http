@@ -7,10 +7,10 @@ POST http://localhost:4001/products/create
 Content-Type: application/json
 
 {
-  "name": "Awesome Widget",
-  "description": "This is a fantastic widget.",
+  "name": "Smart Watch",
+  "description": "This is a fantastic smart watch.",
   "category": "Gadgets",
-  "brand": "WidgetCo",
-  "price": 49.99,
+  "brand": "Samsung",
+  "price": 89.99,
   "stockQuantity": 100
 }
