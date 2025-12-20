@@ -1,9 +1,6 @@
 package com.muhammadminhaz.cartservice.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +13,12 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(
+        name = "cart",
+        indexes = {
+                @Index(name = "idx_cart_customer_status", columnList = "customerId,status")
+        }
+)
 public class Cart {
     @Id
     private UUID id;
