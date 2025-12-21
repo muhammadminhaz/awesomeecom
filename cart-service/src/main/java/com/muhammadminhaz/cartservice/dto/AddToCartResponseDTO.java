@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class AddToCartResponseDTO {
     private String message;
     private String cartId;
+    private int totalProducts;
     private int totalItems;
     private double totalPrice;
     private String status;

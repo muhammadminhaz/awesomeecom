@@ -78,7 +78,9 @@ public class CartService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         cart.setTotalPrice(total);
         cart.setLastUpdatedAt(LocalDateTime.now());
-
+        int totalItemQuantity = cart.getItems().stream()
+                .mapToInt(CartItemRedisModel::getQuantity)
+                .sum();
         redisTemplate.opsForValue().set(key, cart, 1, TimeUnit.MINUTES);
         cartExpiryScheduler.scheduleCartPersistence(dto.getCustomerId().toString(), cart, 1);
 
@@ -86,6 +88,7 @@ public class CartService {
                 "Added to cart successfully",
                 cart.getCartId().toString(),
                 cart.getItems().size(),
+                totalItemQuantity,
                 cart.getTotalPrice().doubleValue(),
                 cart.getStatus()
         );
