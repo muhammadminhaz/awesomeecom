@@ -1,7 +1,7 @@
 package com.muhammadminhaz.cartservice.kafka;
 
-
 import com.muhammadminhaz.cartservice.dto.CartRedisModel;
+import com.muhammadminhaz.cartservice.entity.Cart;
 import com.muhammadminhaz.cartservice.repository.CartRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import tools.jackson.databind.ObjectMapper;
 public class CartPersistentEventConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(CartPersistentEventConsumer.class);
+
     private final CartRepository cartRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -25,22 +26,25 @@ public class CartPersistentEventConsumer {
     @Transactional
     public void handleCartExpired(byte[] payload) {
         try {
-            CartRedisModel cart =
+            CartRedisModel redisCart =
                     objectMapper.readValue(payload, CartRedisModel.class);
 
-            if (cartRepository.existsById(cart.getCartId())) {
-                log.info("Cart already persisted, skipping {}", cart.getCartId());
-                return;
-            }
-            log.info("KAFKA ---------→ Persisting cart {}", cart.getCartId());
+            log.info("KAFKA → Persisting cart {}", redisCart.getCartId());
 
-            cartRepository.save(cart.toCartEntity());
-            redisTemplate.delete("cart:" + cart.getCustomerId());
+            Cart cart = cartRepository
+                    .findById(redisCart.getCartId())
+                    .orElseGet(redisCart::toCartEntity);
 
+            // UPSERT — Redis is source of truth
+            cart.updateFromRedis(redisCart);
+            cartRepository.save(cart);
+            log.info("KAFKA → Data Saved To DB successfully {}", redisCart.getCartId());
+            // Clean Redis after successful persistence
+            redisTemplate.delete("cart:" + redisCart.getCustomerId());
+            log.info("Cart deleted from Redis {}", redisCart.getCartId());
         } catch (Exception e) {
-            log.error("KAFKA ---------→ Failed to process cart event", e);
-            throw e;
+            log.error("KAFKA → Failed to persist cart", e);
+            throw e; // retry by Kafka
         }
     }
 }
-

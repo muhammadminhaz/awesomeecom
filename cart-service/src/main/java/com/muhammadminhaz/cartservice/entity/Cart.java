@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,4 +31,13 @@ public class Cart {
 
     private BigDecimal totalPrice;
     private String status;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    public void updateFromRedis(com.muhammadminhaz.cartservice.dto.CartRedisModel redis) {
+        this.customerId = redis.getCustomerId();
+        this.totalPrice = redis.getTotalPrice();
+        this.status = redis.getStatus();
+    }
 }

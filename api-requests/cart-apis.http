@@ -1,8 +1,9 @@
 ### Get cart for a user
-GET http://localhost:4002/cart/{userId}
+GET http://localhost:4002/cart/81674121-8324-4979-a25f-85ee098189e8
+
 
 ### Add item to cart
-POST http://localhost:4002/carts/add-item
+POST http://localhost:4002/cart/add-item
 Content-Type: application/json
 
 {
@@ -19,4 +20,4 @@ PUT http://localhost:4002/cart/{userId}/item
 DELETE http://localhost:4002/cart/{userId}/item
 
 ### Clear cart
-DELETE http://localhost:4002/cart/{userId}
+DELETE http://localhost:4002/carts/{userId}

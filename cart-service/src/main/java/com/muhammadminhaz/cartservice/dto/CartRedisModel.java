@@ -8,12 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +26,35 @@ public class CartRedisModel implements Serializable {
     private BigDecimal totalPrice;
     private String status;
 
-    private LocalDateTime lastUpdatedAt;
+    private LocalDateTime updatedAt;
+
+    public static CartRedisModel fromEntity(Cart dbCart) {
+
+        CartRedisModel redisCart = new CartRedisModel();
+
+        redisCart.setCartId(dbCart.getId());
+        redisCart.setCustomerId(dbCart.getCustomerId());
+        redisCart.setTotalPrice(dbCart.getTotalPrice());
+        redisCart.setStatus(dbCart.getStatus());
+        redisCart.setUpdatedAt(LocalDateTime.now());
+
+        List<CartItemRedisModel> redisItems = dbCart.getCartItems().stream()
+                .map(item -> {
+                    CartItemRedisModel redisItem = new CartItemRedisModel();
+                    redisItem.setId(item.getId()); // optional, Redis-only
+                    redisItem.setProductId(item.getProductId());
+                    redisItem.setPrice(item.getPrice());
+                    redisItem.setQuantity(item.getQuantity());
+                    redisItem.setSubTotal(item.getSubTotal());
+                    return redisItem;
+                })
+                .toList();
+
+        redisCart.setItems(new ArrayList<>(redisItems));
+
+        return redisCart;
+    }
+
 
     public Cart toCartEntity() {
 
@@ -37,7 +63,8 @@ public class CartRedisModel implements Serializable {
                 customerId,
                 new ArrayList<>(),
                 totalPrice,
-                status
+                status,
+                updatedAt
         );
 
         List<CartItem> cartItems = items.stream()

@@ -2,17 +2,17 @@ package com.muhammadminhaz.cartservice.controller;
 
 import com.muhammadminhaz.cartservice.dto.AddToCartRequestDTO;
 import com.muhammadminhaz.cartservice.dto.AddToCartResponseDTO;
+import com.muhammadminhaz.cartservice.dto.GetCartResponseDTO;
 import com.muhammadminhaz.cartservice.service.CartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
-@RequestMapping(("/carts"))
+@RequestMapping(("/cart"))
 public class CartController {
 
     private static final Logger log = LoggerFactory.getLogger(CartController.class);
@@ -31,8 +31,16 @@ public class CartController {
             log.error("Error adding item to cart", e);
             return ResponseEntity.badRequest().build();
         }
-
-
     }
 
+    @GetMapping("/{customerId}")
+    public ResponseEntity<GetCartResponseDTO> getCart(@PathVariable String customerId) {
+        try {
+            GetCartResponseDTO response = cartService.getCart(customerId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e){
+            log.error("Error getting cart", e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

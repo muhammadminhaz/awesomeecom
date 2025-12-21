@@ -1,9 +1,8 @@
 package com.muhammadminhaz.cartservice.service;
 
-import com.muhammadminhaz.cartservice.dto.AddToCartRequestDTO;
-import com.muhammadminhaz.cartservice.dto.AddToCartResponseDTO;
-import com.muhammadminhaz.cartservice.dto.CartItemRedisModel;
-import com.muhammadminhaz.cartservice.dto.CartRedisModel;
+import com.muhammadminhaz.cartservice.dto.*;
+import com.muhammadminhaz.cartservice.entity.Cart;
+import com.muhammadminhaz.cartservice.repository.CartRepository;
 import com.muhammadminhaz.cartservice.scheduler.CartExpiryScheduler;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,17 +21,18 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class CartService {
+
     private static final Logger log = LoggerFactory.getLogger(CartService.class);
+
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final CartExpiryScheduler cartExpiryScheduler;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final CartRepository cartRepository;
 
     public AddToCartResponseDTO addToCart(AddToCartRequestDTO dto) {
 
-        // Use customerId as part of the Redis key
         String key = "cart:" + dto.getCustomerId();
 
-        // Fetch existing cart from Redis
         Object redisObject = redisTemplate.opsForValue().get(key);
         CartRedisModel cart;
 
@@ -44,45 +44,47 @@ public class CartService {
             cart.setTotalPrice(BigDecimal.ZERO);
             cart.setStatus("ACTIVE");
         } else if (redisObject instanceof LinkedHashMap) {
-            // Convert LinkedHashMap to CartRedisModel
             cart = objectMapper.convertValue(redisObject, CartRedisModel.class);
         } else {
             cart = (CartRedisModel) redisObject;
         }
 
-        // Check if item already exists in cart
         CartItemRedisModel existingItem = cart.getItems().stream()
                 .filter(i -> i.getProductId().equals(dto.getProductId()))
                 .findFirst()
                 .orElse(null);
 
         if (existingItem != null) {
-            // Update quantity and subtotal
             existingItem.setQuantity(existingItem.getQuantity() + 1);
-            existingItem.setSubTotal(existingItem.getPrice()
-                    .multiply(BigDecimal.valueOf(existingItem.getQuantity())));
+            existingItem.setSubTotal(
+                    existingItem.getPrice()
+                            .multiply(BigDecimal.valueOf(existingItem.getQuantity()))
+            );
         } else {
-            // Add new item
             CartItemRedisModel item = new CartItemRedisModel();
             item.setId(UUID.randomUUID());
             item.setProductId(dto.getProductId());
             item.setQuantity(1);
             item.setPrice(dto.getPrice());
-            item.setSubTotal(dto.getPrice().multiply(BigDecimal.valueOf(1)));
+            item.setSubTotal(dto.getPrice());
             cart.getItems().add(item);
         }
 
-        // Recalculate total price
         BigDecimal total = cart.getItems().stream()
                 .map(CartItemRedisModel::getSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         cart.setTotalPrice(total);
-        cart.setLastUpdatedAt(LocalDateTime.now());
+        cart.setUpdatedAt(LocalDateTime.now());
+
         int totalItemQuantity = cart.getItems().stream()
                 .mapToInt(CartItemRedisModel::getQuantity)
                 .sum();
+
         redisTemplate.opsForValue().set(key, cart, 1, TimeUnit.MINUTES);
-        cartExpiryScheduler.scheduleCartPersistence(dto.getCustomerId().toString(), cart, 1);
+        cartExpiryScheduler.scheduleCartPersistence(
+                dto.getCustomerId().toString(), cart, 1
+        );
 
         return new AddToCartResponseDTO(
                 "Added to cart successfully",
@@ -93,4 +95,47 @@ public class CartService {
                 cart.getStatus()
         );
     }
+
+    public GetCartResponseDTO getCart(String customerId) {
+
+        String key = "cart:" + customerId;
+        Object redisObject = redisTemplate.opsForValue().get(key);
+
+        CartRedisModel cart;
+
+        // 1️⃣ Redis hit → use it
+        if (redisObject != null) {
+            cart = (redisObject instanceof LinkedHashMap)
+                    ? objectMapper.convertValue(redisObject, CartRedisModel.class)
+                    : (CartRedisModel) redisObject;
+        }
+        // 2️⃣ Redis miss → load from DB
+        else {
+            Cart dbCart = cartRepository.findCartByCustomerIdAndStatus(UUID.fromString(customerId), "ACTIVE");
+
+            if (dbCart == null) {
+                return GetCartResponseDTO.empty(customerId);
+            }
+
+            // Convert DB → Redis model
+            cart = CartRedisModel.fromEntity(dbCart);
+
+            // Hydrate Redis
+            redisTemplate.opsForValue().set(key, cart, 1, TimeUnit.MINUTES);
+        }
+
+        int totalItemQuantity = cart.getItems().stream()
+                .mapToInt(CartItemRedisModel::getQuantity)
+                .sum();
+
+        return new GetCartResponseDTO(
+                cart.getCartId().toString(),
+                cart.getCustomerId().toString(),
+                cart.getItems(),
+                totalItemQuantity,
+                cart.getTotalPrice().doubleValue(),
+                cart.getStatus()
+        );
+    }
+
 }
