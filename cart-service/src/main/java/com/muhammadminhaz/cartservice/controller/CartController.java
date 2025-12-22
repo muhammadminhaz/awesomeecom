@@ -2,6 +2,7 @@ package com.muhammadminhaz.cartservice.controller;
 
 import com.muhammadminhaz.cartservice.dto.AddToCartRequestDTO;
 import com.muhammadminhaz.cartservice.dto.AddToCartResponseDTO;
+import com.muhammadminhaz.cartservice.dto.ClearCartResponseDTO;
 import com.muhammadminhaz.cartservice.dto.GetCartResponseDTO;
 import com.muhammadminhaz.cartservice.service.CartService;
 import org.slf4j.Logger;
@@ -41,6 +42,20 @@ public class CartController {
         } catch (Exception e){
             log.error("Error getting cart", e);
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/clear-cart/{customerId}")
+    public ResponseEntity<ClearCartResponseDTO> clearCart(@PathVariable String customerId) {
+        try {
+            ClearCartResponseDTO response = cartService.deleteCart(customerId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ClearCartResponseDTO(
+                    e.getMessage(),
+                    null,
+                    "N/A"
+            ));
         }
     }
 }

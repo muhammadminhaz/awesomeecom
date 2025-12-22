@@ -4,6 +4,7 @@ import com.muhammadminhaz.cartservice.dto.*;
 import com.muhammadminhaz.cartservice.entity.Cart;
 import com.muhammadminhaz.cartservice.repository.CartRepository;
 import com.muhammadminhaz.cartservice.scheduler.CartExpiryScheduler;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,8 +112,9 @@ public class CartService {
         }
         // 2️⃣ Redis miss → load from DB
         else {
-            Cart dbCart = cartRepository.findCartByCustomerIdAndStatus(UUID.fromString(customerId), "ACTIVE");
-
+            Cart dbCart = cartRepository
+                    .findCartByCustomerIdAndStatus(UUID.fromString(customerId), "ACTIVE")
+                    .orElse(null);
             if (dbCart == null) {
                 return GetCartResponseDTO.empty(customerId);
             }
@@ -135,6 +137,34 @@ public class CartService {
                 totalItemQuantity,
                 cart.getTotalPrice().doubleValue(),
                 cart.getStatus()
+        );
+    }
+
+    @Transactional
+    public ClearCartResponseDTO deleteCart(String customerId) throws Exception {
+
+        UUID customerUUID = UUID.fromString(customerId);
+        String redisKey = "cart:" + customerId;
+        redisTemplate.delete(redisKey);
+        Cart cart = cartRepository
+                .findCartByCustomerIdAndStatus(customerUUID, "ACTIVE")
+                .orElse(null);
+
+        if (cart == null) {
+            throw new Exception(
+                    "No ACTIVE cart found for customer " + customerId
+            );
+        }
+
+        cart.abandon();
+        cartRepository.save(cart);
+        log.info("cart about to be deleted {}", cart);
+
+
+        return new ClearCartResponseDTO(
+                "Cart cleared successfully",
+                cart != null ? cart.getTotalPrice() : null,
+                "ABANDONED"
         );
     }
 

@@ -20,4 +20,4 @@ PUT http://localhost:4002/cart/{userId}/item
 DELETE http://localhost:4002/cart/{userId}/item
 
 ### Clear cart
-DELETE http://localhost:4002/carts/{userId}
+PUT http://localhost:4002/cart/clear-cart/81674121-8324-4979-a25f-85ee098189e8

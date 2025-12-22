@@ -40,4 +40,8 @@ public class Cart {
         this.totalPrice = redis.getTotalPrice();
         this.status = redis.getStatus();
     }
+
+    public void abandon() {
+        this.status = "ABANDONED";
+    }
 }
