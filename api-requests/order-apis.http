@@ -1,0 +1,12 @@
+### GET request to example server
+POST http://localhost:4003/orders/create-order
+Content-Type: application/json
+
+{
+  "customerId": "81674121-8324-4979-a25f-85ee098189e8",
+  "paymentMethod": "stripe",
+  "cartId": "blabla"
+}
+
+###
+GET http://localhost:4003/orders/81674121-8324-4979-a25f-85ee098189e8
