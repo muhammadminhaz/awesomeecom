@@ -2,6 +2,7 @@ package com.muhammadminhaz.cartservice.service;
 
 import com.muhammadminhaz.cartservice.dto.*;
 import com.muhammadminhaz.cartservice.entity.Cart;
+import com.muhammadminhaz.cartservice.entity.CartItem;
 import com.muhammadminhaz.cartservice.repository.CartRepository;
 import com.muhammadminhaz.cartservice.scheduler.CartExpiryScheduler;
 import jakarta.transaction.Transactional;
@@ -168,4 +169,21 @@ public class CartService {
         );
     }
 
+    @Transactional
+    public UpdateCartStatusResponseDTO updateStatus(UpdateCartStatusRequestDTO request) {
+        UUID cartId = UUID.fromString(request.getCartId());
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+        if (request.getStatus().equals("ORDERED")) {
+            cart.completed();
+        } else if (request.getStatus().equals("CANCELLED")) {
+            cart.cancelled();
+        }
+        cartRepository.save(cart);
+        return new UpdateCartStatusResponseDTO(
+                cart.getId().toString(),
+                cart.getStatus(),
+                "Status updated successfully"
+        );
+    }
 }

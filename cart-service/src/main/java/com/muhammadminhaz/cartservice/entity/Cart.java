@@ -44,4 +44,8 @@ public class Cart {
     public void abandon() {
         this.status = "ABANDONED";
     }
+
+    public void completed() {this.status = "COMPLETED";}
+
+    public void cancelled() {this.status = "CANCELLED";}
 }

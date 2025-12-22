@@ -1,9 +1,6 @@
 package com.muhammadminhaz.cartservice.controller;
 
-import com.muhammadminhaz.cartservice.dto.AddToCartRequestDTO;
-import com.muhammadminhaz.cartservice.dto.AddToCartResponseDTO;
-import com.muhammadminhaz.cartservice.dto.ClearCartResponseDTO;
-import com.muhammadminhaz.cartservice.dto.GetCartResponseDTO;
+import com.muhammadminhaz.cartservice.dto.*;
 import com.muhammadminhaz.cartservice.service.CartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,5 +54,11 @@ public class CartController {
                     "N/A"
             ));
         }
+    }
+
+    @PutMapping("/update-status")
+    public ResponseEntity<UpdateCartStatusResponseDTO> updateStatus(@RequestBody UpdateCartStatusRequestDTO request) {
+        UpdateCartStatusResponseDTO response = cartService.updateStatus(request);
+        return ResponseEntity.ok(response);
     }
 }

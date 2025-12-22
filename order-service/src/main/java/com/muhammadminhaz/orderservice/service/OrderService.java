@@ -45,7 +45,10 @@ public class OrderService {
                 .toList();
 
         Order order = Order.create(customerId, UUID.fromString(cart.getCartId()), orderItems);
+        //TODO Update Cart, Add Payment Gateway
         orderRepository.save(order);
+
+
         return new OrderResponseDTO(
                 order.getId().toString(),
                 order.getStatus(),
