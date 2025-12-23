@@ -7,7 +7,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="notify-service" />
       </profile>
       <profile name="Annotation profile for cart-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -41,7 +40,6 @@
       <module name="cart-service" options="-parameters" />
       <module name="customer-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
-      <module name="notify-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
       <module name="product-service" options="-parameters" />
