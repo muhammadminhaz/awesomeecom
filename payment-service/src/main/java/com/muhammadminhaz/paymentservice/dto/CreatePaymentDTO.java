@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatePaymentDTO {
-    private UUID orderId;
+    private String orderId;
     private BigDecimal amount;
     private String currency = "usd";
     private String customerEmail;

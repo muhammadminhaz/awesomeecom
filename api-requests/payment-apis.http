@@ -1,0 +1,12 @@
+### GET request to example server
+POST localhost:4004/payment/initiate
+Content-Type: application/json
+
+{
+  "orderId": "78425452-164b-4f76-ab8d-9e128d47b00b",
+  "amount": 123,
+  "currency": "usd",
+  "customerEmail": "mminhazurrahman0@gmail.com"
+}
+
+###

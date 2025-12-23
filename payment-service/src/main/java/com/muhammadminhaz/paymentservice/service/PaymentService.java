@@ -11,16 +11,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
 public class PaymentService {
 
-    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     public PaymentResponseDTO createPaymentIntent(CreatePaymentDTO request) {
         try {
 
-            long amountInCents = request.getAmount().multiply(new BigDecimal("100")).longValue();
+            Long amountInCents = request.getAmount().longValue() * 100;
 
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                     .setAmount(amountInCents)
@@ -30,7 +31,7 @@ public class PaymentService {
                                     .setEnabled(true)
                                     .build()
                     )
-                    .putMetadata("orderId", request.getOrderId().toString())
+                    .putMetadata("orderId", request.getOrderId())
                     .setDescription("Order #" + request.getOrderId())
                     .build();
 
@@ -40,17 +41,55 @@ public class PaymentService {
             response.setPaymentIntentId(intent.getId());
             response.setClientSecret(intent.getClientSecret());
             response.setStatus(intent.getStatus());
-            response.setOrderId(request.getOrderId());
-            response.setAmount(intent.getAmount());
+            response.setOrderId(UUID.fromString(request.getOrderId()));
+            response.setAmount(BigDecimal.valueOf(intent.getAmount()));
             response.setCurrency(intent.getCurrency());
 
-            log.info("Created payment intent {} for order {}", intent.getId(), request.getOrderId());
+            logger.info("Created payment intent {} for order {}", intent.getId(), request.getOrderId());
             return response;
 
         } catch (StripeException e) {
-            log.error("Stripe error creating payment intent: {}", e.getMessage());
+            logger.error("Stripe error creating payment intent: {}", e.getMessage());
             throw new RuntimeException("Failed to create payment: " + e.getMessage());
         }
     }
 
+    public void handleWebhookEvent(String eventType, String paymentIntentId) {
+        logger.info("Handling webhook event: {} for payment intent: {}", eventType, paymentIntentId);
+
+        switch (eventType) {
+            case "payment_intent.succeeded":
+                handlePaymentSuccess(paymentIntentId);
+                break;
+            case "payment_intent.payment_failed":
+                handlePaymentFailed(paymentIntentId);
+                break;
+            default:
+                logger.info("Unhandled event type: {}", eventType);
+        }
+    }
+
+    private void handlePaymentSuccess(String paymentIntentId) {
+        try {
+            PaymentIntent intent = PaymentIntent.retrieve(paymentIntentId);
+            String orderId = intent.getMetadata().get("orderId");
+
+            //TODO Notify order service
+
+
+            // Send receipt notification
+            String email = intent.getReceiptEmail();
+            if (email != null) {
+                String amount = String.format("%.2f", intent.getAmount() / 100.0);
+            }
+
+            logger.info("Payment succeeded for order: {}", orderId);
+        } catch (Exception e) {
+            logger.error("Error handling payment success: {}", e.getMessage());
+        }
+    }
+
+    private void handlePaymentFailed(String paymentIntentId) {
+        logger.warn("Payment failed for intent: {}", paymentIntentId);
+    }
 }
