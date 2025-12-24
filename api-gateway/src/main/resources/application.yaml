@@ -1,7 +1,6 @@
 server:
   port: 4006
 
-
 spring:
   application:
     name: api-gateway
@@ -15,24 +14,24 @@ spring:
               predicates:
                 - Path=/customer/**
             - id: product-service
-              uri: http://product-service:4001
+              uri: lb://product-service
               predicates:
                 - Path=/products/**
 
             - id: cart-service
-              uri: http://cart-service:4002
+              uri: lb://cart-service
               predicates:
                 - Path=/cart/**
             - id: order-service
-              uri: http://order-service:4003
+              uri: lb://order-service
               predicates:
                 - Path=/orders/**
             - id: payment-service
-              uri: http://payment-service:4004
+              uri: lb://payment-service
               predicates:
                 - Path=/payments/**
             - id: notification-service
-              uri: http://notification-service:4005
+              uri: lb://notification-service
               predicates:
                 - Path=/notify/**
           default-filters:
@@ -45,52 +44,9 @@ spring:
     redis:
       host: ${SPRING_REDIS_HOST:redis}
       port: ${SPRING_REDIS_PORT:6379}
-
-
-#server:
-#  port: 4006
-#
-#spring:
-#  application:
-#    name: api-gateway
-#    redis:
-#      host: ${SPRING_REDIS_HOST:redis}
-#      port: ${SPRING_REDIS_PORT:6379}
-#  cloud:
-#    gateway:
-#      default-filters:
-#        - name: RequestRateLimiter
-#          args:
-#            redis-rate-limiter.replenishRate: 10
-#            redis-rate-limiter.burstCapacity: 20
-#      routes:
-#        - id: customer-service
-#          uri: http://customer-service:4000
-#          predicates:
-#            - Path=/customer/**
-#
-#        - id: product-service
-#          uri: http://product-service:4001
-#          predicates:
-#            - Path=/products/**
-#
-#        - id: cart-service
-#          uri: http://cart-service:4002
-#          predicates:
-#            - Path=/cart/**
-#        - id: order-service
-#          uri: http://order-service:4003
-#          predicates:
-#            - Path=/orders/**
-#        - id: payment-service
-#          uri: http://payment-service:4004
-#          predicates:
-#            - Path=/payments/**
-#        - id: notification-service
-#          uri: http://notification-service:4005
-#          predicates:
-#            - Path=/notify/**
-#
-#
-#
-#
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
