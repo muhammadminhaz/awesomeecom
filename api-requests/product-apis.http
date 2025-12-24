@@ -1,5 +1,5 @@
 ### GET request to fetch products
-GET http://localhost:4001/products
+GET http://localhost:4006/products
 
 
 ### Create a product

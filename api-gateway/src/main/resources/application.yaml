@@ -1,0 +1,96 @@
+server:
+  port: 4006
+
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: customer-service
+              uri: http://customer-service:4000
+              predicates:
+                - Path=/customer/**
+            - id: product-service
+              uri: http://product-service:4001
+              predicates:
+                - Path=/products/**
+
+            - id: cart-service
+              uri: http://cart-service:4002
+              predicates:
+                - Path=/cart/**
+            - id: order-service
+              uri: http://order-service:4003
+              predicates:
+                - Path=/orders/**
+            - id: payment-service
+              uri: http://payment-service:4004
+              predicates:
+                - Path=/payments/**
+            - id: notification-service
+              uri: http://notification-service:4005
+              predicates:
+                - Path=/notify/**
+          default-filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@ipKeyResolver}"
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:redis}
+      port: ${SPRING_REDIS_PORT:6379}
+
+
+#server:
+#  port: 4006
+#
+#spring:
+#  application:
+#    name: api-gateway
+#    redis:
+#      host: ${SPRING_REDIS_HOST:redis}
+#      port: ${SPRING_REDIS_PORT:6379}
+#  cloud:
+#    gateway:
+#      default-filters:
+#        - name: RequestRateLimiter
+#          args:
+#            redis-rate-limiter.replenishRate: 10
+#            redis-rate-limiter.burstCapacity: 20
+#      routes:
+#        - id: customer-service
+#          uri: http://customer-service:4000
+#          predicates:
+#            - Path=/customer/**
+#
+#        - id: product-service
+#          uri: http://product-service:4001
+#          predicates:
+#            - Path=/products/**
+#
+#        - id: cart-service
+#          uri: http://cart-service:4002
+#          predicates:
+#            - Path=/cart/**
+#        - id: order-service
+#          uri: http://order-service:4003
+#          predicates:
+#            - Path=/orders/**
+#        - id: payment-service
+#          uri: http://payment-service:4004
+#          predicates:
+#            - Path=/payments/**
+#        - id: notification-service
+#          uri: http://notification-service:4005
+#          predicates:
+#            - Path=/notify/**
+#
+#
+#
+#

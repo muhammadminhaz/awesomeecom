@@ -1,5 +1,5 @@
 ### Get cart for a user
-GET http://localhost:4002/cart/81674121-8324-4979-a25f-85ee098189e8
+GET http://localhost:4006/cart/81674121-8324-4979-a25f-85ee098189e8
 
 
 ### Add item to cart
