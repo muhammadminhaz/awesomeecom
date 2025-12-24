@@ -10,7 +10,7 @@ spring:
         webflux:
           routes:
             - id: customer-service
-              uri: http://customer-service:4000
+              uri: lb://customer-service
               predicates:
                 - Path=/customer/**
             - id: product-service

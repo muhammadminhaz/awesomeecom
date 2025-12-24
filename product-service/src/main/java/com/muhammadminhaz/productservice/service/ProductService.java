@@ -7,6 +7,8 @@ import com.muhammadminhaz.productservice.entity.Product;
 import com.muhammadminhaz.productservice.entity.ProductImage;
 import com.muhammadminhaz.productservice.repository.ProductRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository productRepository;
 
     public ProductService(ProductRepository productRepository) {
@@ -65,7 +68,7 @@ public class ProductService {
         response.setTotalPages(productPage.getTotalPages());
         response.setTotalItems(productPage.getTotalElements());
         response.setPageSize(productPage.getSize());
-
+        log.info("Products Size: {}", dtos.size());
         return response;
     }
 
