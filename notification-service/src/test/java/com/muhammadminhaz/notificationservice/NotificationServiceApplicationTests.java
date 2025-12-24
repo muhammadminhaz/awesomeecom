@@ -1,4 +1,4 @@
-package com.muhammadminhaz.notifyservice;
+package com.muhammadminhaz.notificationservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
