@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'awesomeecom-services'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+          - api-gateway:4006
+          - customer-service:4000
+          - product-service:4001
+          - cart-service:4002
+          - order-service:4003
+          - payment-service:4004
+          - notification-service:4005
+          - eureka-server:8761
+
