@@ -1,6 +1,6 @@
 ### Registration
 POST /customer/register HTTP/1.1
-Host: localhost:4000
+Host: localhost:4006
 Content-Type: application/json
 Accept: application/json
 
@@ -29,9 +29,9 @@ Accept: application/json
 > {% client.global.set("token", response.body.token) %}
 
 ### Validate Token
-GET http://localhost:4000/customer/validate
+GET http://localhost:4006/customer/validate
 Authorization: Bearer {{token}}
 
 ### Get Customer Profile
-GET http://localhost:4000/customer/me
+GET http://localhost:4006/customer/me
 Authorization: Bearer {{token}}
