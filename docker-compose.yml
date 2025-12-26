@@ -267,7 +267,7 @@ services:
     depends_on:
       eureka-server:
         condition: service_healthy
-      product-db:
+      cart-db:
         condition: service_started
     networks:
       - awesomeecom-network
@@ -291,8 +291,40 @@ services:
     depends_on:
       eureka-server:
         condition: service_healthy
-      product-db:
+      order-db:
         condition: service_started
+    networks:
+      - awesomeecom-network
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    ports:
+      - "4004:4004"
+    environment:
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - awesomeecom-network
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "4005:4005"
+    environment:
+      FROM_EMAIL: ${FROM_EMAIL}
+      FROM_NAME: ${FROM_NAME}
+      GMAIL_PASSWORD: ${GMAIL_PASSWORD}
+      GMAIL_USERNAME: ${GMAIL_USERNAME} # Use App Password, not actual password
+    depends_on:
+      eureka-server:
+        condition: service_healthy
     networks:
       - awesomeecom-network
 

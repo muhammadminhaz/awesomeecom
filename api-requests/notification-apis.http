@@ -1,12 +1,12 @@
 ### GET request to example server
-POST localhost:4005/notify/order-confirmation
+POST localhost:4006/notify/order-confirmation
 Content-Type: application/json
 
 {
   "customerName": "Minhaz",
   "email": "mminhazurrahman0@gmail.com",
-  "orderId": "78425452-164b-4f76-ab8d-9e128d47b00b",
-  "orderTotal": "49.99",
+  "orderId": "bae6ed7f-8304-446c-880d-9068f8661813",
+  "orderTotal": "89.99",
   "shippingAddress": "Khilgaon, Dhaka"
 }
 
