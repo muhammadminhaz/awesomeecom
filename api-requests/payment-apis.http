@@ -1,4 +1,4 @@
-### GET request to example server
+### Initiate Payment Intent
 POST http://localhost:4006/payment/initiate
 Content-Type: application/json
 
@@ -8,6 +8,3 @@ Content-Type: application/json
   "currency": "usd",
   "customerEmail": "mminhazurrahman0@gmail.com"
 }
-
-###
-GET http://localhost:4006/payment
