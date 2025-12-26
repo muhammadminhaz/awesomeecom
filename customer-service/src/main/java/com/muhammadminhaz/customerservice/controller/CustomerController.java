@@ -4,6 +4,8 @@ import com.muhammadminhaz.customerservice.dto.*;
 import com.muhammadminhaz.customerservice.service.CustomerService;
 import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.Operation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
+    private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
     private final CustomerService customerService;
 
     public CustomerController(CustomerService customerService) {
@@ -42,6 +45,7 @@ public class CustomerController {
         }
 
         String token = tokenOptional.get();
+        log.info("User logged in! username: {}", loginRequestDTO.getUsername());
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
