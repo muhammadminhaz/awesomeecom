@@ -21,10 +21,10 @@ public class PaymentService {
     public PaymentResponseDTO createPaymentIntent(CreatePaymentDTO request) {
         try {
 
-            Long amountInCents = request.getAmount().longValue() * 100;
+            Long amount = request.getAmount().longValue();
 
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                    .setAmount(amountInCents)
+                    .setAmount(amount * 100)
                     .setCurrency(request.getCurrency())
                     .setAutomaticPaymentMethods(
                             PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
