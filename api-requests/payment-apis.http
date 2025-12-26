@@ -3,10 +3,11 @@ POST http://localhost:4006/payment/initiate
 Content-Type: application/json
 
 {
-  "orderId": "bae6ed7f-8304-446c-880d-9068f8661813",
+  "orderId": "bae6ef-8304-4c-880d-9068f8661813",
   "amount": 89.99,
   "currency": "usd",
   "customerEmail": "mminhazurrahman0@gmail.com"
 }
 
 ###
+GET http://localhost:4006/payment

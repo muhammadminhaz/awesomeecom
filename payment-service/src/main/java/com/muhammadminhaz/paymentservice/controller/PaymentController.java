@@ -19,12 +19,17 @@ public class PaymentController {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
     private final PaymentService paymentService;
-    @Value("${stripe.webhook.secret}")
-    private final String webhookSecret = "your-webhook-secret";
 
+    @Value("${stripe.webhook.secret}")
+    private String webhookSecret;
 
     public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
+    }
+
+    @GetMapping
+    public String test() {
+        return "test";
     }
 
     @PostMapping("/initiate")
