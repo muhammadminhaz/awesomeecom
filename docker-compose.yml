@@ -73,7 +73,7 @@ services:
       - awesomeecom-network
 
     # -----------------------------
-    # Kafka (with Zookeeper)
+    # Kafka
     # -----------------------------
   kafka:
     image: apache/kafka:latest
@@ -193,11 +193,8 @@ networks:
 
 volumes:
   customer-db:
+  product-db:
+  cart-db:
+  order-db:
   elasticsearch-data:
   logstash-data:
-#  vendor_data:
-#  product_data:
-#  cart_data:
-#  order_data:
-#  prometheus_data:
-#  grafana_data:

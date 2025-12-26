@@ -7,6 +7,8 @@ import com.muhammadminhaz.customerservice.entity.Customer;
 import com.muhammadminhaz.customerservice.repository.CustomerRepository;
 import com.muhammadminhaz.customerservice.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.Optional;
 
 @Service
 public class CustomerService {
+    private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
@@ -57,7 +60,7 @@ public class CustomerService {
         customer.setName(registerRequestDTO.getName());
         customer.setAddress(registerRequestDTO.getAddress());
         customer.setPhone(registerRequestDTO.getPhone());
-
+        log.info("New customer registered! username: {}, email: {}", customer.getUsername(), customer.getEmail());
         customerRepository.save(customer);
         return true;
     }
