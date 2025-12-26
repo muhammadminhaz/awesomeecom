@@ -3,7 +3,7 @@ GET http://localhost:4006/products
 
 
 ### Create a product
-POST http://localhost:4001/products/create
+POST http://localhost:4006/products/create
 Content-Type: application/json
 
 {

@@ -1,15 +1,15 @@
 ### Get cart for a user
-GET http://localhost:4006/cart/81674121-8324-4979-a25f-85ee098189e8
+GET http://localhost:4006/cart/2d9437ff-040e-4479-bae7-4f93e076f199
 
 
 ### Add item to cart
-POST http://localhost:4002/cart/add-item
+POST http://localhost:4006/cart/add-item
 Content-Type: application/json
 
 {
-  "customerId": "81674121-8324-4979-a25f-85ee098189e8",
-  "productId": "18ba68c4-75b4-4062-9157-c6f2ea32ba6a",
-  "price": 49.99
+  "customerId": "2d9437ff-040e-4479-bae7-4f93e076f199",
+  "productId": "163bfe81-bd9c-4f0b-98bf-38ea5703299b",
+  "price": 89.99
 }
 ### c9025012-ef87-45ce-a097-20b3e2c98409
 
