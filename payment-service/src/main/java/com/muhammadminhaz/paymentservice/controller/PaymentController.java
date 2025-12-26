@@ -27,11 +27,6 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @GetMapping
-    public String test() {
-        return "test";
-    }
-
     @PostMapping("/initiate")
     public ResponseEntity<PaymentResponseDTO> initiatePayment(@RequestBody CreatePaymentDTO request) {
         return ResponseEntity.ok(paymentService.createPaymentIntent(request));
