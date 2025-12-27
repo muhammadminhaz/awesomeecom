@@ -5,5 +5,7 @@ metadata:
   namespace: awesomeecom
 type: Opaque
 stringData:
+  EUREKA_INSTANCE_HOSTNAME: payment-service
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
   STRIPE_API_KEY: your_stripe_api_key
   STRIPE_WEBHOOK_SECRET: your_stripe_webhook_secret
