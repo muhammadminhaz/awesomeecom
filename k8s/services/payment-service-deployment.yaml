@@ -1,0 +1,46 @@
+
+# Customer Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: awesomeecom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: payment-service:1.0
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - secretRef:
+                name: payment-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "384Mi"
+---
+# Customer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: awesomeecom
+spec:
+  selector:
+    app: payment-service
+  ports:
+    - port: 4004
+      targetPort: 4004
+  type: ClusterIP

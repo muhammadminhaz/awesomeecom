@@ -1,0 +1,59 @@
+
+# ==============================
+# Cart DB
+# ==============================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-db
+  namespace: awesomeecom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart-db
+  template:
+    metadata:
+      labels:
+        app: cart-db
+    spec:
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "192Mi"
+        limits:
+          cpu: "200m"
+          memory: "256Mi"
+      containers:
+        - name: cart-db
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "db"
+            - name: POSTGRES_USER
+              value: "admin"
+            - name: POSTGRES_PASSWORD
+              value: "admin"
+          volumeMounts:
+            - name: cart-db-storage
+              mountPath: /var/lib/postgresql/
+      volumes:
+        - name: cart-db-storage
+          persistentVolumeClaim:
+            claimName: cart-db-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-db
+  namespace: awesomeecom
+spec:
+  selector:
+    app: cart-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

@@ -1,0 +1,59 @@
+
+# ==============================
+# Order DB
+# ==============================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-db
+  namespace: awesomeecom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-db
+  template:
+    metadata:
+      labels:
+        app: order-db
+    spec:
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "192Mi"
+        limits:
+          cpu: "200m"
+          memory: "256Mi"
+      containers:
+        - name: order-db
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "db"
+            - name: POSTGRES_USER
+              value: "admin"
+            - name: POSTGRES_PASSWORD
+              value: "admin"
+          volumeMounts:
+            - name: order-db-storage
+              mountPath: /var/lib/postgresql/
+      volumes:
+        - name: order-db-storage
+          persistentVolumeClaim:
+            claimName: order-db-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-db
+  namespace: awesomeecom
+spec:
+  selector:
+    app: order-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

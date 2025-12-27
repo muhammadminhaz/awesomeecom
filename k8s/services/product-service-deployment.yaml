@@ -1,0 +1,48 @@
+
+# Customer Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  namespace: awesomeecom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      containers:
+        - name: product-service
+          image: product-service:1.0
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - configMapRef:
+                name: product-service-config
+            - secretRef:
+                name: product-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "384Mi"
+---
+# Customer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+  namespace: awesomeecom
+spec:
+  selector:
+    app: product-service
+  ports:
+    - port: 4001
+      targetPort: 4001
+  type: ClusterIP

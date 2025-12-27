@@ -1,0 +1,46 @@
+
+# Customer Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: awesomeecom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: notification-service:1.0
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - secretRef:
+                name: notification-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "384Mi"
+---
+# Customer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: awesomeecom
+spec:
+  selector:
+    app: notification-service
+  ports:
+    - port: 4004
+      targetPort: 4004
+  type: ClusterIP

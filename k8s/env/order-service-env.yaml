@@ -1,0 +1,23 @@
+# 1️⃣ ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-config
+  namespace: awesomeecom
+data:
+  SPRING_DATASOURCE_URL: jdbc:postgresql://cart-db:5432/db
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  SPRING_CACHE_TYPE: redis
+  SPRING_DATA_REDIS_HOST: redis
+  SPRING_DATA_REDIS_PORT: 6379
+---
+# 2️⃣ Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: order-service-secret
+  namespace: awesomeecom
+type: Opaque
+stringData:
+  SPRING_DATASOURCE_USERNAME: admin
+  SPRING_DATASOURCE_PASSWORD: admin

@@ -1,0 +1,58 @@
+# ==============================
+# Product DB
+# ==============================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-db
+  namespace: awesomeecom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-db
+  template:
+    metadata:
+      labels:
+        app: product-db
+    spec:
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "192Mi"
+        limits:
+          cpu: "200m"
+          memory: "256Mi"
+      containers:
+        - name: product-db
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "db"
+            - name: POSTGRES_USER
+              value: "admin"
+            - name: POSTGRES_PASSWORD
+              value: "admin"
+          volumeMounts:
+            - name: product-db-storage
+              mountPath: /var/lib/postgresql/
+      volumes:
+        - name: product-db-storage
+          persistentVolumeClaim:
+            claimName: product-db-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-db
+  namespace: awesomeecom
+spec:
+  selector:
+    app: product-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

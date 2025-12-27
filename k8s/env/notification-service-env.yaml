@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: notification-service-secret
+  namespace: awesomeecom
+type: Opaque
+stringData:
+  FROM_EMAIL: email
+  FROM_NAME: name
+  GMAIL_PASSWORD: app password
+  GMAIL_USERNAME: email

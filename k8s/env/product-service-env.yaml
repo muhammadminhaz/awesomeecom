@@ -1,0 +1,20 @@
+# 1️⃣ ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-service-config
+  namespace: awesomeecom
+data:
+  SPRING_DATASOURCE_URL: jdbc:postgresql://product-db:5432/db
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
+---
+# 2️⃣ Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: product-service-secret
+  namespace: awesomeecom
+type: Opaque
+stringData:
+  SPRING_DATASOURCE_USERNAME: admin
+  SPRING_DATASOURCE_PASSWORD: admin

@@ -1,0 +1,48 @@
+
+# Customer Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-service
+  namespace: awesomeecom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart-service
+  template:
+    metadata:
+      labels:
+        app: cart-service
+    spec:
+      containers:
+        - name: cart-service
+          image: cart-service:1.0
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - configMapRef:
+                name: cart-service-config
+            - secretRef:
+                name: cart-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "384Mi"
+---
+# Customer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service
+  namespace: awesomeecom
+spec:
+  selector:
+    app: cart-service
+  ports:
+    - port: 4002
+      targetPort: 4002
+  type: ClusterIP
