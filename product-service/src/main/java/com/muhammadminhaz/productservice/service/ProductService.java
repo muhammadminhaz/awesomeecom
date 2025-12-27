@@ -74,6 +74,7 @@ public class ProductService {
 
     @Transactional
     public ProductDto createProduct(CreateProductRequestDto createProductRequestDto) {
+        log.info("Product creation initiated, {}", createProductRequestDto.getName());
         Product product = Product.builder()
                 .sku("PROD-" + System.currentTimeMillis() % 1_000_000_000)
                 .name(createProductRequestDto.getName())
@@ -86,6 +87,7 @@ public class ProductService {
                 .updatedAt(LocalDateTime.now())
                 .build();
         Product savedProduct = productRepository.save(product);
+        log.info("Product created successfully, Product Id: {}", savedProduct.getId());
         return mapToDto(savedProduct);
     }
 
