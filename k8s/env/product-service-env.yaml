@@ -7,6 +7,8 @@ metadata:
 data:
   SPRING_DATASOURCE_URL: jdbc:postgresql://product-db:5432/db
   SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  EUREKA_INSTANCE_HOSTNAME: product-service
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
 ---
 # 2️⃣ Secret
 apiVersion: v1
