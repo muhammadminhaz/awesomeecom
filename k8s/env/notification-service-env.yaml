@@ -5,6 +5,8 @@ metadata:
   namespace: awesomeecom
 type: Opaque
 stringData:
+  EUREKA_INSTANCE_HOSTNAME: notification-service
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
   FROM_EMAIL: email
   FROM_NAME: name
   GMAIL_PASSWORD: app password
