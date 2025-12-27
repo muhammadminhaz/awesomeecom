@@ -19,7 +19,7 @@ spec:
         - name: notification-service
           image: notification-service:1.0
           ports:
-            - containerPort: 4000
+            - containerPort: 4005
           envFrom:
             - secretRef:
                 name: notification-service-secret
@@ -41,6 +41,6 @@ spec:
   selector:
     app: notification-service
   ports:
-    - port: 4004
-      targetPort: 4004
+    - port: 4005
+      targetPort: 4005
   type: ClusterIP
