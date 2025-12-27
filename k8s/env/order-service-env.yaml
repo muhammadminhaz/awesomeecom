@@ -19,5 +19,7 @@ metadata:
   namespace: awesomeecom
 type: Opaque
 stringData:
+  EUREKA_INSTANCE_HOSTNAME: notification-service
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
   SPRING_DATASOURCE_USERNAME: admin
   SPRING_DATASOURCE_PASSWORD: admin
