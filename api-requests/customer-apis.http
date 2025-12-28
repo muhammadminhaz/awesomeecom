@@ -35,3 +35,16 @@ Authorization: Bearer {{token}}
 ### Get Customer Profile
 GET http://localhost:4006/customer/me
 Authorization: Bearer {{token}}
+
+### Update Customer Profile
+PUT http://localhost:4006/customer/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "address": "123 Main Street, City",
+  "phone": "+8801000000000"
+}

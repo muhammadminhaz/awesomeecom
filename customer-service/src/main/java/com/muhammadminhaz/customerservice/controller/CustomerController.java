@@ -49,16 +49,6 @@ public class CustomerController {
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
-    @Operation(summary = "Validate Token")
-    @GetMapping("/validate")
-    public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        return customerService.validateToken(authHeader.substring(7)) ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
     @Operation(summary = "Get Customer Profile")
     @GetMapping("/me")
     public ResponseEntity<CustomerProfileResponseDTO> getCustomerProfile(@RequestHeader("Authorization") String authHeader) {
@@ -72,6 +62,18 @@ public class CustomerController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+        }
+    }
+
+    @Operation(summary = "Update Customer Profile")
+    @PutMapping("/me")
+    public ResponseEntity<ProfileUpdateResponseDTO> updateCustomer(@RequestHeader("Authorization") String authHeader, @RequestBody ProfileUpdateRequestDTO profileUpdateRequestDTO) {
+        try {
+            String token = customerService.extractToken(authHeader);
+            ProfileUpdateResponseDTO profile = customerService.updateCustomerProfile(token, profileUpdateRequestDTO);
+            return ResponseEntity.ok(profile);
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ProfileUpdateResponseDTO("error", e.getMessage(), profileUpdateRequestDTO.getUsername()));
         }
     }
 }

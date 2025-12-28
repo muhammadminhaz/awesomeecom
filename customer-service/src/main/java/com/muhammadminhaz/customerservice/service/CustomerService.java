@@ -1,8 +1,6 @@
 package com.muhammadminhaz.customerservice.service;
 
-import com.muhammadminhaz.customerservice.dto.CustomerProfileResponseDTO;
-import com.muhammadminhaz.customerservice.dto.LoginRequestDTO;
-import com.muhammadminhaz.customerservice.dto.RegisterRequestDTO;
+import com.muhammadminhaz.customerservice.dto.*;
 import com.muhammadminhaz.customerservice.entity.Customer;
 import com.muhammadminhaz.customerservice.repository.CustomerRepository;
 import com.muhammadminhaz.customerservice.util.JwtUtil;
@@ -87,4 +85,46 @@ public class CustomerService {
         }
         return authHeader.substring(7);
     }
+
+    public ProfileUpdateResponseDTO updateCustomerProfile(
+            String token,
+            ProfileUpdateRequestDTO dto
+    ) {
+        String currentUsername = jwtUtil.extractUsername(token);
+
+        Customer customer = findByUsername(currentUsername)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Customer not found"
+                        )
+                );
+
+        customer.setName(dto.getName());
+        customer.setEmail(dto.getEmail());
+        customer.setAddress(dto.getAddress());
+        customer.setPhone(dto.getPhone());
+
+        if (dto.getUsername() != null &&
+                !dto.getUsername().equals(customer.getUsername())) {
+
+            if (customerRepository.existsByUsername(dto.getUsername())) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Username already taken"
+                );
+            }
+
+            customer.setUsername(dto.getUsername());
+        }
+
+        customerRepository.save(customer);
+        log.info("Customer profile updated! username: {}", customer.getUsername());
+        return new ProfileUpdateResponseDTO(
+                "success",
+                "Profile updated successfully. Please login again.",
+                customer.getUsername()
+        );
+    }
+
 }
