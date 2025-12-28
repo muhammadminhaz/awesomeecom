@@ -56,11 +56,11 @@ spec:
               mountPath: /usr/share/logstash/data
           resources:
             requests:
-              cpu: "150m"
-              memory: "512Mi"
+              cpu: 100m
+              memory: 256Mi
             limits:
-              cpu: "300m"
-              memory: "768Mi"
+              cpu: 200m
+              memory: 512Mi
 
       volumes:
         - name: pipeline
