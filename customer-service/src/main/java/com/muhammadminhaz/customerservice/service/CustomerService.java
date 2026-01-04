@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -125,6 +126,16 @@ public class CustomerService {
                 "Profile updated successfully. Please login again.",
                 customer.getUsername()
         );
+    }
+
+    @Transactional
+    public void deleteCustomer(String token) {
+        String username = jwtUtil.extractUsername(token);
+        if (!customerRepository.existsByUsername(username)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found");
+        }
+        customerRepository.deleteByUsername(username);
+        log.info("Customer deleted! username: {}", username);
     }
 
 }

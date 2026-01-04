@@ -12,4 +12,6 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     boolean existsCustomerByUsername(String username);
 
     boolean existsByUsername(String username);
+
+    void deleteByUsername(String username);
 }

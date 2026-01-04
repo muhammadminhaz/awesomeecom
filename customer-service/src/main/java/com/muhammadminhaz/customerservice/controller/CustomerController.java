@@ -76,4 +76,19 @@ public class CustomerController {
             return ResponseEntity.ok(new ProfileUpdateResponseDTO("error", e.getMessage(), profileUpdateRequestDTO.getUsername()));
         }
     }
+
+    @Operation(summary = "Delete Customer Account")
+    @DeleteMapping("/me")
+    public ResponseEntity<DeleteResponseDTO> deleteCustomer(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = customerService.extractToken(authHeader);
+            customerService.deleteCustomer(token);
+            return ResponseEntity.ok(new DeleteResponseDTO("success", "Customer account deleted successfully"));
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new DeleteResponseDTO("error", e.getMessage()));
+        }
+    }
 }
