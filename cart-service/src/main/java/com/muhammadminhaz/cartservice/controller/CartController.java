@@ -2,6 +2,8 @@ package com.muhammadminhaz.cartservice.controller;
 
 import com.muhammadminhaz.cartservice.dto.*;
 import com.muhammadminhaz.cartservice.service.CartService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(("/cart"))
+@Tag(name = "Cart Controller", description = "Endpoints for managing the shopping cart")
 public class CartController {
 
     private static final Logger log = LoggerFactory.getLogger(CartController.class);
@@ -21,6 +24,7 @@ public class CartController {
     }
 
     @PostMapping("/add-item")
+    @Operation(summary = "Add an item to the cart")
     public ResponseEntity<AddToCartResponseDTO> addToCart(@RequestBody AddToCartRequestDTO addToCartRequestDTO) {
         try {
             AddToCartResponseDTO response = cartService.addToCart(addToCartRequestDTO);
