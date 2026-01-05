@@ -1,6 +1,8 @@
 package com.muhammadminhaz.orderservice.service;
 
 import com.muhammadminhaz.orderservice.client.CartClient;
+import com.muhammadminhaz.orderservice.client.CustomerClient;
+import com.muhammadminhaz.orderservice.client.NotificationClient;
 import com.muhammadminhaz.orderservice.dto.*;
 import com.muhammadminhaz.orderservice.entity.Order;
 import com.muhammadminhaz.orderservice.entity.OrderItem;
@@ -10,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Duration;
 import java.util.List;
@@ -23,6 +28,8 @@ public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final OrderRepository orderRepository;
     private final CartClient cartClient;
+    private final CustomerClient customerClient;
+    private final NotificationClient notificationClient;
 
     @Transactional
     public OrderResponseDTO createOrder(CreateOrderRequestDTO request) {
@@ -48,6 +55,15 @@ public class OrderService {
         //TODO Update Cart, Add Payment Gateway
         orderRepository.save(order);
 
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        sendOrderNotification(order, request.getCustomerId());
+                    }
+                }
+        );
+
 
         return new OrderResponseDTO(
                 order.getId().toString(),
@@ -60,6 +76,35 @@ public class OrderService {
                         i.getSubTotal()
                 )).collect(Collectors.toList())
         );
+    }
+
+    private void sendOrderNotification(Order order, String customerId) {
+        try {
+            CustomerResponseDTO customer =
+                    customerClient.getCustomer(customerId).block();
+
+            if (customer == null) {
+                log.warn("Customer not found, skipping notification");
+                return;
+            }
+
+            NotificationRequestDTO notificationRequest =
+                    NotificationRequestDTO.builder()
+                            .email(customer.getEmail())
+                            .orderId(order.getId().toString())
+                            .customerName(customer.getName())
+                            .orderTotal(order.getTotalPrice().toString())
+                            .shippingAddress(customer.getAddress())
+                            .build();
+
+            notificationClient.sendOrderConfirmation(notificationRequest)
+                    .block();
+
+            log.info("Order confirmation notification sent");
+
+        } catch (Exception e) {
+            log.error("Failed to send order notification", e);
+        }
     }
 
 

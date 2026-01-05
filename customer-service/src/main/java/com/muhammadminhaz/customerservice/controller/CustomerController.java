@@ -65,6 +65,13 @@ public class CustomerController {
         }
     }
 
+    @GetMapping("/{customerId}")
+    @Operation(summary = "Get Customer Profile by ID")
+    public ResponseEntity<CustomerProfileResponseDTO> getCustomerById(@PathVariable String customerId) {
+        CustomerProfileResponseDTO profile = customerService.getCustomerById(customerId);
+        return ResponseEntity.ok(profile);
+    }
+
     @Operation(summary = "Update Customer Profile")
     @PutMapping("/me")
     public ResponseEntity<ProfileUpdateResponseDTO> updateCustomer(@RequestHeader("Authorization") String authHeader, @RequestBody ProfileUpdateRequestDTO profileUpdateRequestDTO) {

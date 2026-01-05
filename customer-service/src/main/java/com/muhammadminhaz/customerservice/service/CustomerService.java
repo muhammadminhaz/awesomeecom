@@ -77,6 +77,18 @@ public class CustomerService {
         return customerProfileResponseDTO;
     }
 
+    public CustomerProfileResponseDTO getCustomerById(String customerId) {
+        Customer customer = customerRepository.findById(java.util.UUID.fromString(customerId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+        CustomerProfileResponseDTO customerProfileResponseDTO = new CustomerProfileResponseDTO();
+        customerProfileResponseDTO.setUsername(customer.getUsername());
+        customerProfileResponseDTO.setName(customer.getName());
+        customerProfileResponseDTO.setEmail(customer.getEmail());
+        customerProfileResponseDTO.setAddress(customer.getAddress());
+        customerProfileResponseDTO.setPhone(customer.getPhone());
+        return customerProfileResponseDTO;
+    }
+
     public String extractToken(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new ResponseStatusException(
