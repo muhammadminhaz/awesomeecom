@@ -1,5 +1,7 @@
 package com.muhammadminhaz.productservice.entity;
 
+import com.muhammadminhaz.productservice.dto.CreateProductRequestDto;
+import com.muhammadminhaz.productservice.dto.ProductDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
@@ -47,5 +49,16 @@ public class Product {
             orphanRemoval = true
     )
     private List<ProductImage> images = new ArrayList<>();
+
+    public void updateProduct(CreateProductRequestDto productDto) {
+        this.name = productDto.getName();
+        this.description = productDto.getDescription();
+        this.category = productDto.getCategory();
+        this.brand = productDto.getBrand();
+        this.price = productDto.getPrice();
+        this.stockQuantity = productDto.getStockQuantity();
+        this.updatedAt = LocalDateTime.now();
+        this.images = productDto.getImageUrls().stream().map(url -> ProductImage.builder().url(url).product(this).build()).toList();
+    }
 }
 

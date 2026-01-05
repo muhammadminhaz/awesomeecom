@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -55,7 +56,17 @@ public class ProductController {
         return ResponseEntity.ok(createdProduct);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable UUID id, @RequestBody CreateProductRequestDto updateRequest) {
+        ProductDto updatedProduct = productService.updateProduct(id, updateRequest);
+        return ResponseEntity.ok(updatedProduct);
+    }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
 
 
 }

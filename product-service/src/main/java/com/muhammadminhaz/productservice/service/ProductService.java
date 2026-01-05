@@ -9,6 +9,8 @@ import com.muhammadminhaz.productservice.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    @Cacheable(value = "products", key = "#page + '-' + #size + '-' + #sort + '-' + #sortBy + '-' + #searchValue")
     public PaginatedResponse<ProductDto> getAllProducts(int page, int size, String sort, String sortBy, String searchValue) {
         Pageable pageable = PageRequest.of(
                 page - 1,
@@ -73,6 +76,7 @@ public class ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public ProductDto createProduct(CreateProductRequestDto createProductRequestDto) {
         log.info("Product creation initiated, {}", createProductRequestDto.getName());
         Product product = Product.builder()
@@ -89,6 +93,31 @@ public class ProductService {
         Product savedProduct = productRepository.save(product);
         log.info("Product created successfully, Product Id: {}", savedProduct.getId());
         return mapToDto(savedProduct);
+    }
+
+    @Transactional
+    @CacheEvict(value = "products", allEntries = true)
+    public ProductDto updateProduct(UUID id, CreateProductRequestDto updateRequest) {
+        log.info("Updating product with id: {}", id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        product.updateProduct(updateRequest);
+
+        Product updatedProduct = productRepository.save(product);
+        log.info("Product updated successfully, Product Id: {}", updatedProduct.getId());
+        return mapToDto(updatedProduct);
+    }
+
+    @Transactional
+    @CacheEvict(value = "products", allEntries = true)
+    public void deleteProduct(UUID id) {
+        log.info("Deleting product with id: {}", id);
+        if (!productRepository.existsById(id)) {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
+        productRepository.deleteById(id);
+        log.info("Product deleted successfully, Product Id: {}", id);
     }
 
     private ProductDto mapToDto(Product product) {
