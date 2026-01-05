@@ -11,7 +11,7 @@ import java.time.Duration;
 @Service
 @RequiredArgsConstructor
 public class CustomerClient {
-    private final WebClient webClient = WebClient.create("http://customer-service:4001");
+    private final WebClient webClient = WebClient.create("http://customer-service:4000");
 
     public Mono<CustomerResponseDTO> getCustomer(String customerId) {
         return webClient.get()

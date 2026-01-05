@@ -11,7 +11,7 @@ import java.time.Duration;
 @Service
 @RequiredArgsConstructor
 public class NotificationClient {
-    private final WebClient webClient = WebClient.create("http://notification-service:4006");
+    private final WebClient webClient = WebClient.create("http://notification-service:4005");
 
     public Mono<Void> sendOrderConfirmation(NotificationRequestDTO request) {
         return webClient.post()
