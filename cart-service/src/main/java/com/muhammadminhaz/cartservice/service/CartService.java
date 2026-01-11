@@ -85,7 +85,7 @@ public class CartService {
 
         redisTemplate.opsForValue().set(key, cart, 1, TimeUnit.MINUTES);
         cartExpiryScheduler.scheduleCartPersistence(
-                dto.getCustomerId().toString(), cart, 1
+                dto.getCustomerId().toString(), cart, 60
         );
 
         return new AddToCartResponseDTO(
