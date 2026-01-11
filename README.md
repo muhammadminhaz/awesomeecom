@@ -1,3 +1,5 @@
+https://roadmap.sh/projects/scalable-ecommerce-platform
+
 # AwesomeEcom - Microservices E-commerce Platform
 
 AwesomeEcom is a robust, scalable, and modern e-commerce backend application built using a Microservices architecture with Spring Boot. It leverages industry-standard tools for service discovery, load balancing, messaging, monitoring, and container orchestration.
